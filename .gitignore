@@ -1,0 +1,27 @@
+# Raw and intermediate data — large, and regenerable via src/download_trips.py
+data/raw/
+data/interim/
+
+# Local DuckDB database file(s) — regenerable via src/build_db.py
+*.duckdb
+*.duckdb.wal
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+.env
+
+# Streamlit secrets, if you add any API keys later
+.streamlit/secrets.toml
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
