@@ -34,6 +34,15 @@ for k in keys:
         with open(local_path, "wb") as f:
             f.write(response.content)
 
-#unzip files
-with zipfile.ZipFile("data/raw/202607-baywheels-tripdata.csv.zip") as zf:
-    print(zf.namelist())
+#get list of zip files
+for zip_path in Path("data/raw").glob("*.zip"):
+
+    with zipfile.ZipFile(zip_path) as zf:
+        for f in zf.namelist():
+            local_path = Path("data/interim/" + f)
+            if f.startswith("__MACOSX"):
+                continue
+            elif local_path.exists():
+                continue
+            else:
+                zf.extract(f, "data/interim")
