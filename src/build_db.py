@@ -40,13 +40,20 @@ def normalize_legacy(df):
     # add two columns don't exist at all in legacy files
         # rideable_type gets filled with the constant "classic_bike" (no e-bikes yet in this era)
         # ride_id gets filled with null for every row (legacy trips never had one)
-
+    df['rideable_type'] = "classic_bike"
+    df["ride_id"] = None
 
     # rename AND value translation
         # user_type becomes member_casual
-            # subscriber → member
-            # customer → casual
+            # Subscriber → Member
+            # Customer → Casual
+    df = df.rename(columns={"user_type": "member_casual"})
+    df['member_casual'] = df['member_casual'].map({'Subscriber': 'member', 'Customer': 'casual'})
+
     # two (possibly three, if in a transitional file) columns get dropped entirely
         # bike_id, bike_share_for_all_trip, and rental_access_method
     #return dataframe with the 14 unified columns
-    pass
+    return df[['ride_id', 'rideable_type', 'started_at', 'ended_at', 'duration_sec',
+           'start_station_name', 'start_station_id', 'end_station_name',
+           'end_station_id', 'start_lat', 'start_lng', 'end_lat', 'end_lng',
+           'member_casual']]
