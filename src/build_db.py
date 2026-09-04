@@ -1,18 +1,16 @@
 
 import pandas as pd
+from pathlib import Path
 
 def normalize_modern(df):
+    df = df.copy()
     #Convert started_at and ended_at to real datetimes
     #Then compute duration_sec from their difference
     #Select just the unified columns and return that as the result
-    df = df.copy()
-
     started = pd.to_datetime(df['started_at'])
     ended = pd.to_datetime(df['ended_at'])
     seconds = (ended - started).dt.total_seconds()
-    print(seconds)
     df['duration_sec'] = seconds.astype('int64')
-    print(df['duration_sec'])
     return df[['ride_id', 'rideable_type', 'started_at', 'ended_at', 'duration_sec',
        'start_station_name', 'start_station_id', 'end_station_name',
        'end_station_id', 'start_lat', 'start_lng', 'end_lat', 'end_lng',
@@ -57,3 +55,20 @@ def normalize_legacy(df):
            'start_station_name', 'start_station_id', 'end_station_name',
            'end_station_id', 'start_lat', 'start_lng', 'end_lat', 'end_lng',
            'member_casual']]
+
+def build_unified_dataset():
+    normalized_dfs = []
+    # go through every file in data/interim/
+    file_path = sorted(Path("../data/interim").glob("*.csv"))
+    for path in file_path:
+        df = pd.read_csv(path)
+    # determine which normalization function to use and run it through
+        if 'ride_id' in df.columns:
+            ndf = normalize_modern(df)
+            normalized_dfs.append(ndf)
+        else:
+            ndf = normalize_legacy(df)
+            normalized_dfs.append(ndf)
+    # concat each normalized dataframe into one big unified dataframe
+    unified = pd.concat(normalized_dfs, ignore_index=True)
+    return unified
